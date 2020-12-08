@@ -115,7 +115,7 @@ class BetaVAEDecoder(nn.Module):
         self.kernel_size = kernel_size
         self.stride = stride
         
-        d_in, d_out = num_filters, num_filters / 2
+        d_in, d_out = num_filters, int(num_filters / 2)
         self.bridge = nn.Linear(latent_dim, d_in * 4)
         
         layers = []
@@ -130,7 +130,7 @@ class BetaVAEDecoder(nn.Module):
                 nn.LeakyReLU()
             ])
             d_in = d_out
-            d_out = d_out / 2
+            d_out = int(d_out / 2)
 
         self.decoder = nn.Sequential(*layers)
         

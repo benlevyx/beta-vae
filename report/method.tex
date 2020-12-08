@@ -1,0 +1,18 @@
+\section{Methods}
+
+\subsection{Variational auto-encoders}
+
+The goal of a VAE is to learn a distribution $\ptheta$ to model our data $\vx$ and its hypothesized latent variables $\vz$. We can arrange related $\vx$ and $\vz$ using Bayes' rule:
+\begin{equation*}
+    \ptheta(\vx|\vz) = \frac{\ptheta(\vz|\vx)\ptheta(\vx)}{\ptheta(\vz)}
+\end{equation*}
+Under this framework, we want to maximize the log-probability of data generated according to the process: (1) sample a point $\vz\sim\ptheta(\vz)$, then sample $\vx\sim\ptheta(\vx|\vz)$:
+\begin{align*}
+    \ell &= \max_\theta\sum_{i=1}^N\log\ptheta(\vx_i) \\
+    \intertext{Marginalizing over all values of $\vx$,}
+    &= \max_\theta\sum_{i=1}^N\log\int\ptheta(\vx_i|\vz)\ptheta(\vz)d\vz
+\end{align*}
+We now introduce an auxiliary distribution, $\qphi$. This will serve two purposes: (1) allow us to massage this expression into one involving a KL-divergence, and (2) enable {\it amortised} inference (explained later).
+\begin{align*}
+    \ell &= \max_\theta\sum_{i=1}^N\log\int\ptheta(\vx_i|\vz)\ptheta(\vz)d\vz
+\end{align*}

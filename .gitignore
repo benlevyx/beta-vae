@@ -131,3 +131,16 @@ dmypy.json
 .vscode
 .idea
 .DS_Store
+
+# Latex
+*.aux
+*.bbl
+*.bcf
+*.blg
+*.fdb_latexmk
+*.fls
+*.run.xml
+*.synctex.gz
+
+# Big data files
+data/
