@@ -20,12 +20,20 @@ On its own, $\beta$-VAE can lead to some interesting results. For instance, the 
 
 \subsection{Disentanglement and information bottleneck}
 
-Burgess et al. \cite{burgess2018understanding} take an information-theoretic approach to understanding how $\beta$-VAE improves disentanglement in the latent representations $\vz$. Both the prior $p(\vz)$ and the posterior $\qphi(\vz|\vx)$ are factorized, as per the mean-field assumption, so we can conceptualize $q(\vz|\vx)$ as a set of noisy channels, each transmitting some information about the input $\vx_i$. The KL-divergence term in the loss, $\kl(\qphi(\vz|\vx)||p(\vz))$ can be seen as a bound on the information contained in $\qphi$. $\kl$ will be 0 only if $\vmu_i = 0, \Sigma_i = I$, meaning that $\qphi$ is simply white noise and contains no useful information about $\vx_i$. As $\kl$ increases, $\qphi$ can deviate further from $\N(0, I)$ and contain more information that is particular to $\vx_i$. As can be seen in figure \ref{fig:beta-vae-disentagled}, when $\beta$ is increased, the sparsity of the latent encoding is greater, since only two out of the six possible latent dimensions differ from the prior, while the reconstructions are indistinguishable from the vanilla VAE reconstructions.
+Burgess et al. \cite{burgess2018understanding} take an information-theoretic approach to understanding how $\beta$-VAE improves disentanglement in the latent representations $\vz$. Both the prior $p(\vz)$ and the posterior $\qphi(\vz|\vx)$ are factorized, as per the mean-field assumption, so we can conceptualize $q(\vz|\vx)$ as a set of noisy channels, each transmitting some information about the input $\vx_i$. The KL-divergence term in the loss, $\kl(\qphi(\vz|\vx)||p(\vz))$ can be seen as a bound on the information contained in $\qphi$. $\kl$ will be 0 only if $\vmu_i = 0, \Sigma_i = I$, meaning that $\qphi$ is simply white noise and contains no useful information about $\vx_i$. As $\kl$ increases, $\qphi$ can deviate further from $\N(0, I)$ and contain more information that is particular to $\vx_i$. As can be seen in figure \ref{fig:beta-vae-disentagled}, when $\beta$ is increased, the sparsity of the latent encoding is greater, since only two out of the six possible latent dimensions differ noticeably from the prior, while the reconstructions are indistinguishable from the vanilla VAE reconstructions.
 
 \begin{figure}
-    \label{fig:beta-vae-disentagled}
+    \centering
     \includegraphics[width=\linewidth]{beta-vae-disentangled.png}
     \caption{Comparison of vanilla VAE ($\beta=1$) with strongly disentangled $\beta$-VAE ($\beta=150$). The dataset is a set of Gaussian blobs located in various locations in the cartesian plane (top row of both panels). The second row of each panel is the reconstructions of the original images. The remaining rows are traversals of one of the latent dimensions. The latent dimensions are arranged from bottom to top in order of highest to lowest $\kl$ from the prior standard Gaussian.}
+    \label{fig:beta-vae-disentagled}
+\end{figure}
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.5\textwidth]{disentanglement-results}
+    \caption{Results from the \cite{higgins2016beta} comparing the performance of different dimensionality reduction techniques vis-a-vis the proposed disentanglement metric. $\beta$-VAE and DC-IGN both reach nearly perfect accuracy, whereas a vanilla VAE is only able to successfully classify just over 60\% of generative factors based on the latent representations.}
+    \label{fig:disentanglement-results}
 \end{figure}
 
 \subsection{Dimensionality reduction perspective}

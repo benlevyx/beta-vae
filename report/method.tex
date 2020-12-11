@@ -1,8 +1,15 @@
 \section{Methods}
 
+In this section we first build up intuition and theory for vanilla (standard) VAEs before extending the math to $\beta$-VAE.
+
 \subsection{Variational auto-encoders}
 
-The goal of a VAE is to learn a distribution $\ptheta$ to model our data $\vx$ and its hypothesized latent variables $\vz$. We can arrange related $\vx$ and $\vz$ using Bayes' rule:
+We have data $\{\vx_i\}_{i=1}^N$ and we wish to find some low-dimensional (latent) representation for each $i$: $\{\vz_i\}_{i=1}^N$. We assume that the data are in fact generated stochastically conditioned on the latent representations, such that:
+\begin{align*}
+    \vx|\vz \sim p(\vx|\vz)
+\end{align*}
+
+The goal of a VAE is to learn this distribution, with parameters $\theta$, $\ptheta$ to jointly model our data $\vx$ and its hypothesized latent variables $\vz$. We can arrange related $\vx$ and $\vz$ using Bayes' rule:
 \begin{equation*}
     \ptheta(\vx|\vz) = \frac{\ptheta(\vz|\vx)\ptheta(\vx)}{\ptheta(\vz)}
 \end{equation*}
@@ -14,7 +21,7 @@ Under this framework, we want to maximize the log-probability of data generated 
 \end{align*}
 
 
-We now introduce an auxiliary distribution, $\qphi$.  allow us to massage this expression into one involving a KL-divergence.
+We now introduce an auxiliary distribution, $\qphi$. This will allow us to massage this expression into one involving a KL-divergence.
 \begin{align*}
     \ell &= \sum_{i=1}^N\log\int\ptheta(\vx_i|\vz_i)\ptheta(\vz_i)\frac{\qphi(\vz_i)}{\qphi(\vz_i)}d\vz_i \\
     &= \sum_{i=1}^N\log\int\frac{\ptheta(\vx_i,\vz_i)}{\qphi(\vz_i)}\qphi(\vz_i)d\vz_i \\
@@ -23,10 +30,10 @@ We now introduce an auxiliary distribution, $\qphi$.  allow us to massage this e
     &\geq \sum_{i=1}^N\E_{\vz\sim\qphi}\log\left[\frac{\ptheta(\vx_i,\vz_i)}{\qphi(\vz_i)}\right] \\
     \ell &= \sum_{i=1}^N(\E_{\vz\sim\qphi}[\log\ptheta(\vx_i, \vz_i)] - \E_{\vz\sim\qphi}[\log\qphi(\vz)])
 \end{align*}
-The definition of the KL divergence between $\qphi$ and $\ptheta$ is:
+Recall that the definition of the KL divergence between $\qphi$ and $\ptheta$ is:
 \begin{align*}
     \kl(\qphi(\vz)||\ptheta(\vz|\vx)) &= \Eq\left[ \log\frac{\qphi(\vz)}{\ptheta(\vz|\vx)} \right] \\
-    \intertext{Since $\ptheta(\vz|\vx) = \frac{\ptheta(\vz,\vx)}{\ptheta(\vx)}$}
+    \intertext{Since $\ptheta(\vz|\vx) = \frac{\ptheta(\vz,\vx)}{\ptheta(\vx)}$ (by definition of conditional probability),}
     \kl(\qphi(\vz)||\ptheta(\vz|\vx)) &= -\left( \Eq[\log\ptheta(\vz,\vx)] - \Eq[\log\qphi(\vz)]\right) + \log\ptheta(\vx)
 \end{align*}
 Plugging this back into our log-likelihood,
@@ -45,7 +52,7 @@ In theory, we could choose an arbitrarily expressive family of distributions $\q
 
 In our case, we operationalize this by saying that $\qphi$ is an isotropic Gaussian (diagonal covariance) \cite{blei2011}. Although this assumption reduces the expressiveness of the variational family $\qphi$, we gain significantly in terms of computational efficiency when it comes time to learn the parameters of the distribution.
 
-At this point, we are in effect trying to learn a unique distribution $\qphi(\vx|\vz)$ for each $\vx$. If we have $N$ observations and a latent space of dimension $d$, then if the latent distribution is Gaussian, we would need to learn a mean and variance for each dimension of each latent variable, or $2\times N \times d$. In other words, $N\gg p$ (where $p$ is the number of parameters in the model), which both dramatically increases the variance of the parameter estimates (they are highly dependent on the particular data sample at hand) and increases the cost of fitting the model. To get around this, we perform {\it amortised} variational inference: instead of directly estimating $\mu_i$ and $\Sigma_i$ for each $i = 1, \dots, N$, we assume that each $\mu_i, \Sigma_i$ can be approximated by a function $g_\phi(\vx)$, typically a neural network \cite{jaanTutorial}. We refer to this function interchangeably as the {\bf encoder} or {\bf inference network}. This is reresented by the rectangle in figure \ref{fig:encoder-decoder} and is denoted $g_\phi$ here. Because the weights $\phi$ are shared across all observations, we say that the cost of learning $\phi$ is amortised across the entire dataset (hence, ``amortised variational inference''). Symmetrically, the conditional posterior distribution $\ptheta(\vx|\vz)$ is implemented as a neural network that is typically the mirror image of the encoder, which is called the {\bf decoder} or {\bf generative network} and is denoted $f_\theta$ here.
+At this point, we are in effect trying to learn a unique distribution $\qphi(\vx|\vz)$ for each $\vx$. If we have $N$ observations and a latent space of dimension $d$, then if the latent distribution is Gaussian, we would need to learn a mean and variance for each dimension of each latent variable, or $2\times N \times d$. In other words, $N\gg p$ (where $p$ is the number of parameters in the model), which both dramatically increases the variance of the parameter estimates (they are highly dependent on the particular data sample at hand) and increases the cost of fitting the model. To get around this, we perform {\it amortised} variational inference: instead of directly estimating $\mu_i$ and $\Sigma_i$ for each $i = 1, \dots, N$, we assume that each $\mu_i, \Sigma_i$ can be approximated by a function $g_\phi(\vx)$, typically a neural network \cite{jaanTutorial}. We refer to this function interchangeably as the {\bf encoder} or {\bf inference network}. This is reresented by the left rectangle in figure \ref{fig:encoder-decoder} and is denoted $g_\phi$ here. Because the weights $\phi$ are shared across all observations, we say that the cost of learning $\phi$ is amortised across the entire dataset (hence, ``amortised variational inference''). Symmetrically, the conditional posterior distribution $\ptheta(\vx|\vz)$ is implemented as a neural network that is typically the mirror image of the encoder, which is called the {\bf decoder} or {\bf generative network} and is denoted $f_\theta$ here.
 
 \begin{figure}[h]
     \includegraphics[width=\linewidth]{encoder-decoder.png}
@@ -55,7 +62,7 @@ At this point, we are in effect trying to learn a unique distribution $\qphi(\vx
 
 \subsection{The reparameterization trick}
 
-A further advantage of amortisation via the encoder and decoder neural networks is that it allows us to convert this problem from one of sampling from a posterior distribution -- which can require the use of computationally intensive or mathematically complex methods such as expectation-maximization -- to a simple non-convex optimization problem. That is, all the terms in the ELBO loss function can be expressed in terms of $\phi$ and $\theta$, meaning that if we can differentiate through all the operations involved, then this problem can be solved with gradient descent. To revisit, the encoder and decoder form a single algorithm:
+A further advantage of variational inference is that it allows us to convert this problem from one of sampling from a posterior distribution -- which can require the use of computationally intensive or mathematically complex methods such as expectation-maximization -- to a simple non-convex optimization problem. That is, all the terms in the ELBO loss function can be expressed in terms of $\phi$ and $\theta$, meaning that if we can differentiate through all the operations involved, then this problem can be solved with gradient descent. To revisit, the encoder and decoder form a single algorithm:
 \begin{enumerate}
     \item Given $\vx$, compute $\vmu, \Sigma = g_\phi(\vx)$
     \item Sample $\vz\sim\N(\vmu,\Sigma)$
@@ -105,7 +112,7 @@ Immediately, we can recognize that this is nearly identical to the vanilla VAE l
 
 The authors of the original $\beta$-VAE paper go a step further and propose a ``disentanglement metric'' to quantify how well the model's latent representations align with the hypothesized generative factors for the data \cite{higgins2016beta}.
 
-Formally, we assume the data $\vx$ are drawn from a dataset $\D=\{X, V, W\}$, where $X$ is the data matrix, and $V, W$ are matrices of hypothesized {\it generative factors} for each data point. For instance, a factor for a dataset of faces might be {\it skin tone} or {\it glasses}. An image is created using a simulator: $\vx\sim\Sim(\vv, \vw)$. Then,
+Formally, we assume the data $\vx$ are drawn from a dataset $\D=\{X, V\}$, where $X$ is the data matrix, and $V$ is a matrix of hypothesized {\it generative factors} for each data point. For instance, a factor for a dataset of faces might be {\it skin tone} or {\it glasses}. An image is created using a simulator: $\vx\sim\Sim(\vv)$. Then,
 \begin{enumerate}
     \item Uniformly sample factor $y$ from the set of $K$ possible generative factors
     \item Repeat $L$ times:
@@ -128,4 +135,4 @@ This algorithm can be seen in figure \ref{fig:disentanglement-metric}
 
 \subsection{Implementation}
 
-Depending on the type and complexity of the data, various architectures for the inference and generative networks are used. In the simplest case, each is a feed-forward neural network, which is common for either numeric data or small-sized image data (e.g. MNIST, which is $28\times28\times1$). For larger image data, such as the CelebA dataset ($64\times64\times3$), convolutional neural networks (CNNs) are often used, with the structure of the generative network (often referred to as the "encoder") mirroring the structure of the inference network (often referred to as the "decoder"). The weights of the generative and inference networks are found using well-known gradient descent algorithms (e.g. the authors use Adam, RMSProp, and Adagrad for different experiments).
+Depending on the type and complexity of the data, various architectures for the inference and generative networks are used. In the simplest case, each is a feed-forward neural network, which is common for either numeric data or small-sized image data (e.g. MNIST, which is $28\times28\times1$). For larger image data, such as the CelebA dataset ($64\times64\times3$), convolutional neural networks (CNNs) are often used, with the structure of the encoder neural network mirroring the structure of the decoder neural network. The weights of the encoder and decoder are found using well-known gradient descent algorithms (e.g. the authors use Adam, RMSProp, and Adagrad for different experiments).
