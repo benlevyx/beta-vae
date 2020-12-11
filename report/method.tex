@@ -9,7 +9,7 @@ We have data $\{\vx_i\}_{i=1}^N$ and we wish to find some low-dimensional (laten
     \vx|\vz \sim p(\vx|\vz)
 \end{align*}
 
-The goal of a VAE is to learn this distribution, with parameters $\theta$, $\ptheta$ to jointly model our data $\vx$ and its hypothesized latent variables $\vz$. We can arrange related $\vx$ and $\vz$ using Bayes' rule:
+$p$ is commonly either a Gaussian distribution (in the case of normally distribuetd data) or a Bernoulli distribution (in the case of pixels). The goal of a VAE is to learn a good approximation to this distribution, $\ptheta$, with parameters $\theta$, to model our data $\vx$, as well as the distribution $\ptheta(\vz|\vx)$ to model the hypothesized latent variables $\vz$ conditioned on the observed data. We can arrange related $\vx$ and $\vz$ using Bayes' rule:
 \begin{equation*}
     \ptheta(\vx|\vz) = \frac{\ptheta(\vz|\vx)\ptheta(\vx)}{\ptheta(\vz)}
 \end{equation*}
@@ -21,7 +21,7 @@ Under this framework, we want to maximize the log-probability of data generated 
 \end{align*}
 
 
-We now introduce an auxiliary distribution, $\qphi$. This will allow us to massage this expression into one involving a KL-divergence.
+We now introduce an auxiliary distribution, $\qphi$. This will allow us to massage this expression into one involving a KL-divergence and will ultimately be the distribution that we learn using the model.
 \begin{align*}
     \ell &= \sum_{i=1}^N\log\int\ptheta(\vx_i|\vz_i)\ptheta(\vz_i)\frac{\qphi(\vz_i)}{\qphi(\vz_i)}d\vz_i \\
     &= \sum_{i=1}^N\log\int\frac{\ptheta(\vx_i,\vz_i)}{\qphi(\vz_i)}\qphi(\vz_i)d\vz_i \\
@@ -89,7 +89,7 @@ This means that sampling $\vz\sim\N(\vmu,\Sigma)$ is equivalent to sampling $\ve
 
 \subsection{$\beta$-VAE}
 
-In the original paper, the authors provide a derivation of the $\beta$-VAE loss using constrained optimization \cite{higgins2016beta}. Given data $\vx$ distributed according to the data distribution $\D$, the goal is to jointly learn generative parameters $\theta$ and latent parameters $\phi$ for the distributions $\ptheta$ and $\qphi$, respectively. We want to find $\theta$ and $\phi$ such that the posterior log-probability $\ptheta(\vx|\vz)$ where $\vz\sim\qphi$ is maximized:
+In the original paper, the authors provide an independent derivation of the $\beta$-VAE loss using constrained optimization \cite{higgins2016beta}. Given data $\vx$ distributed according to the data distribution $\D$, the goal is to jointly learn generative parameters $\theta$ and latent parameters $\phi$ for the distributions $\ptheta$ and $\qphi$, respectively. We want to find $\theta$ and $\phi$ such that the posterior log-probability $\ptheta(\vx|\vz)$ where $\vz\sim\qphi$ is maximized:
 \begin{align*}
     \theta^*,\phi^* = \underset{\theta,\phi}{\argmax}\E_{\vx\sim\D}\left[ \Eq\left[ \log\ptheta\left( \vx|\vz \right) \right] \right]
 \end{align*}
@@ -125,7 +125,7 @@ Formally, we assume the data $\vx$ are drawn from a dataset $\D=\{X, V\}$, where
     \item Use $\bar{z}_{\diff}$ as the input for a linear classifier (i.e. logistic regression), where the goal is to predict the factor $y$ that was kept constant between all pairs of latent factors
 \end{enumerate}
 
-This algorithm can be seen in figure \ref{fig:disentanglement-metric}
+This algorithm can be seen in figure \ref{fig:disentanglement-metric}. The intuition behind this metric is that when a pair of data points $(x_{1,l}, x_{2,l})$ has the same value for some generative factor, then a well-disentangled latent representation will be such that a small subset of the latent dimensions will correspond to that factor and will therefore have small difference, averaged over many such pairs. Thus, a linear classifier trained on supervised pairs of $(\bar{z}_{\diff}, y)$ will be able to map the averaged difference vectors to the corresponding generative factor that was held constant across the pairs.
 
 \begin{figure}
     \includegraphics[width=\linewidth]{disentanglement-metric.png}
