@@ -1,0 +1,16 @@
+\BOOKMARK [1][-]{section.1}{Introduction}{}% 1
+\BOOKMARK [1][-]{section.2}{Methods}{}% 2
+\BOOKMARK [2][-]{subsection.2.1}{Variational auto-encoders}{section.2}% 3
+\BOOKMARK [2][-]{subsection.2.2}{Choice of q}{section.2}% 4
+\BOOKMARK [2][-]{subsection.2.3}{The reparameterization trick}{section.2}% 5
+\BOOKMARK [2][-]{subsection.2.4}{-VAE}{section.2}% 6
+\BOOKMARK [3][-]{subsubsection.2.4.1}{Measuring disentanglement}{subsection.2.4}% 7
+\BOOKMARK [2][-]{subsection.2.5}{Implementation}{section.2}% 8
+\BOOKMARK [1][-]{section.3}{Discussion}{}% 9
+\BOOKMARK [2][-]{subsection.3.1}{Strengths}{section.3}% 10
+\BOOKMARK [2][-]{subsection.3.2}{Disentanglement and information bottleneck}{section.3}% 11
+\BOOKMARK [2][-]{subsection.3.3}{Dimensionality reduction perspective}{section.3}% 12
+\BOOKMARK [2][-]{subsection.3.4}{Weaknesses}{section.3}% 13
+\BOOKMARK [1][-]{section.4}{Experiment}{}% 14
+\BOOKMARK [2][-]{subsection.4.1}{Model architecture and dataset}{section.4}% 15
+\BOOKMARK [2][-]{subsection.4.2}{Effect of \040on latent space}{section.4}% 16

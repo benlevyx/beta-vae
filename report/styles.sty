@@ -1,6 +1,14 @@
 \usepackage[english]{babel}
 \usepackage[utf8]{inputenc}
 \usepackage[letterpaper, margin=1in]{geometry}
+\usepackage[parfill]{parskip}
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    filecolor=magenta,
+    urlcolor=blue
+}
 
 \usepackage{amsmath}
 \usepackage{amssymb}
@@ -15,13 +23,28 @@
 \newcommand{\R}{\mathbb{R}}
 \newcommand{\N}{\mathcal{N}}
 \newcommand{\E}{\mathbb{E}}
+\newcommand{\D}{\mathcal{D}}
+\newcommand{\F}{\mathcal{F}}
 
 % Vectors
+\newcommand{\vv}{\vec{v}}
+\newcommand{\vw}{\vec{w}}
 \newcommand{\vx}{\vec{x}}
 \newcommand{\vy}{\vec{y}}
 \newcommand{\vz}{\vec{z}}
 \newcommand{\vmu}{\vec{\mu}}
+\newcommand{\vsig}{\vec{\sigma}}
 
 % Distributions
 \newcommand{\ptheta}{p_\theta}
 \newcommand{\qphi}{q_\phi}
+\newcommand{\Eq}{\E_{\vz\sim\qphi}}
+\newcommand{\Ep}{\E_{\vz\sim\ptheta}}
+
+% Operators
+\newcommand{\kl}{D_{KL}}
+\newcommand{\argmax}{\operatorname{argmax}}
+\newcommand{\Sim}{\mathbf{Sim}}
+
+% Text
+\newcommand{\diff}{\text{diff}}
